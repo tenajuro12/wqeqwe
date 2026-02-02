@@ -1,0 +1,67 @@
+[
+  {
+    "id": "bitcoin",
+    "symbol": "btc",
+    "name": "Bitcoin",
+    "image": "https://assets.coingecko.com/coins/images/1/small/bitcoin.png",
+    "current_price": 98234.50,
+    "market_cap": 1935000000000,
+    "market_cap_rank": 1,
+    "total_volume": 45500000000,
+    "price_change_percentage_24h": 2.34,
+    "circulating_supply": 19000000,
+    "total_supply": 21000000
+  },
+  {
+    "id": "ethereum",
+    "symbol": "eth",
+    "name": "Ethereum",
+    "image": "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+    "current_price": 3456.75,
+    "market_cap": 415000000000,
+    "market_cap_rank": 2,
+    "total_volume": 28200000000,
+    "price_change_percentage_24h": -1.23,
+    "circulating_supply": 120000000,
+    "total_supply": null
+  },
+  {
+    "id": "tether",
+    "symbol": "usdt",
+    "name": "Tether",
+    "image": "https://assets.coingecko.com/coins/images/325/small/Tether.png",
+    "current_price": 1.00,
+    "market_cap": 125000000000,
+    "market_cap_rank": 3,
+    "total_volume": 89500000000,
+    "price_change_percentage_24h": 0.01,
+    "circulating_supply": 125000000000,
+    "total_supply": 125000000000
+  },
+  {
+    "id": "binancecoin",
+    "symbol": "bnb",
+    "name": "BNB",
+    "image": "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png",
+    "current_price": 623.20,
+    "market_cap": 90500000000,
+    "market_cap_rank": 4,
+    "total_volume": 2100000000,
+    "price_change_percentage_24h": 3.67,
+    "circulating_supply": 145000000,
+    "total_supply": 145000000
+  },
+  {
+    "id": "solana",
+    "symbol": "sol",
+    "name": "Solana",
+    "image": "https://assets.coingecko.com/coins/images/4128/small/solana.png",
+    "current_price": 195.45,
+    "market_cap": 92300000000,
+    "market_cap_rank": 5,
+    "total_volume": 4800000000,
+    "price_change_percentage_24h": 5.12,
+    "circulating_supply": 472000000,
+    "total_supply": null
+  }
+]

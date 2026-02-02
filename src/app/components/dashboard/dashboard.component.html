@@ -1,0 +1,193 @@
+<div class="dashboard-container">
+  <ng-container *ngIf="viewModel$ | async as vm">
+    
+    <header class="dashboard-header">
+      <h1>Crypto Monitoring Dashboard</h1>
+      <div class="header-stats" *ngIf="vm.portfolioStats">
+        <div class="stat-card">
+          <span class="stat-label">Watching</span>
+          <span class="stat-value">{{ vm.portfolioStats.totalAssets }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Avg Change</span>
+          <span class="stat-value" [ngClass]="getChangeClass(vm.portfolioStats.avgChange)">
+            {{ formatChange(vm.portfolioStats.avgChange) }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="search-section">
+      <input 
+        type="text" 
+        class="search-input"
+        [value]="vm.searchQuery"
+        (input)="onSearchChange($any($event.target).value)"
+        placeholder="Search cryptocurrencies..."
+      />
+      <span class="search-hint" *ngIf="vm.searchQuery">
+        Found {{ vm.assets.length }} result(s)
+      </span>
+    </div>
+
+    <div class="charts-section" *ngIf="vm.selectedAssets.length > 0 && vm.selectedAssets.length <= 3">
+      <app-crypto-chart 
+        *ngFor="let assetId of vm.selectedAssets.slice(0, 3)"
+        [coinId]="assetId"
+        [title]="getAssetName(assetId, vm.assets) + ' Price Chart'">
+      </app-crypto-chart>
+    </div>
+
+    <div class="sorting-controls">
+      <button 
+        class="sort-button" 
+        [class.active]="vm.sorting.sortBy === 'marketCap'"
+        (click)="onSort('marketCap')">
+        Market Cap
+        <span class="sort-arrow" *ngIf="vm.sorting.sortBy === 'marketCap'">
+          {{ vm.sorting.sortOrder === 'desc' ? '↓' : '↑' }}
+        </span>
+      </button>
+      <button 
+        class="sort-button" 
+        [class.active]="vm.sorting.sortBy === 'price'"
+        (click)="onSort('price')">
+        Price
+        <span class="sort-arrow" *ngIf="vm.sorting.sortBy === 'price'">
+          {{ vm.sorting.sortOrder === 'desc' ? '↓' : '↑' }}
+        </span>
+      </button>
+      <button 
+        class="sort-button" 
+        [class.active]="vm.sorting.sortBy === 'change24h'"
+        (click)="onSort('change24h')">
+        24h Change
+        <span class="sort-arrow" *ngIf="vm.sorting.sortBy === 'change24h'">
+          {{ vm.sorting.sortOrder === 'desc' ? '↓' : '↑' }}
+        </span>
+      </button>
+      <button 
+        class="sort-button" 
+        [class.active]="vm.sorting.sortBy === 'volume24h'"
+        (click)="onSort('volume24h')">
+        Volume
+        <span class="sort-arrow" *ngIf="vm.sorting.sortBy === 'volume24h'">
+          {{ vm.sorting.sortOrder === 'desc' ? '↓' : '↑' }}
+        </span>
+      </button>
+    </div>
+
+    <div class="loading-container" *ngIf="vm.loading && !vm.hasData">
+      <div class="spinner"></div>
+      <p>Loading cryptocurrency data...</p>
+    </div>
+
+    <div class="error-container" *ngIf="vm.error">
+      <div class="error-icon">⚠️</div>
+      <h3>Error Loading Data</h3>
+      <p>{{ vm.error }}</p>
+      <button class="retry-button" (click)="onRetry()">Retry</button>
+    </div>
+
+    <div class="empty-container" *ngIf="vm.isEmpty">
+      <p>No cryptocurrencies found.</p>
+    </div>
+
+    <div class="table-container" *ngIf="vm.hasData && !vm.error">
+      <table class="crypto-table">
+        <thead>
+          <tr>
+            <th>Watch</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>24h Change</th>
+            <th>Volume (24h)</th>
+            <th>Market Cap</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            *ngFor="let asset of vm.assets; trackBy: trackByAssetId"
+            [class.selected]="isAssetSelected(asset.id, vm.selectedAssets)"
+            class="asset-row">
+            
+            <td>
+              <input 
+                type="checkbox"
+                [checked]="isAssetSelected(asset.id, vm.selectedAssets)"
+                (change)="onToggleAsset(asset.id)"
+              />
+            </td>
+            
+            <td class="asset-name">
+              <div class="asset-info">
+                <img *ngIf="asset.image" [src]="asset.image" [alt]="asset.name" class="coin-image">
+                <div class="asset-text">
+                  <span class="symbol">{{ asset.symbol }}</span>
+                  <span class="name">{{ asset.name }}</span>
+                </div>
+              </div>
+            </td>
+            
+            <td class="price">
+              {{ formatPrice(asset.price) }}
+            </td>
+            
+            <td [ngClass]="getChangeClass(asset.change24h)" class="change">
+              {{ formatChange(asset.change24h) }}
+            </td>
+            
+            <td class="volume">
+              {{ formatLargeNumber(asset.volume24h) }}
+            </td>
+            
+            <td class="market-cap">
+              {{ formatLargeNumber(asset.marketCap) }}
+            </td>
+            
+            <td class="last-updated">
+              {{ asset.lastUpdated | date:'HH:mm:ss' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="live-indicator" *ngIf="!vm.loading">
+        <span class="live-dot"></span>
+        Live Updates Active
+      </div>
+    </div>
+
+    <div class="portfolio-summary" *ngIf="vm.portfolioStats">
+      <h3>Watched Assets Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="label">Total Assets:</span>
+          <span class="value">{{ vm.portfolioStats.totalAssets }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Average 24h Change:</span>
+          <span class="value" [ngClass]="getChangeClass(vm.portfolioStats.avgChange)">
+            {{ formatChange(vm.portfolioStats.avgChange) }}
+          </span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Top Performer:</span>
+          <span class="value">
+            {{ vm.portfolioStats.topPerformer.symbol }} 
+            ({{ formatChange(vm.portfolioStats.topPerformer.change24h) }})
+          </span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Worst Performer:</span>
+          <span class="value">
+            {{ vm.portfolioStats.worstPerformer.symbol }} 
+            ({{ formatChange(vm.portfolioStats.worstPerformer.change24h) }})
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
